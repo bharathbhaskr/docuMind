@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from services.llm_service import ask_llm
 
 app = FastAPI()
 
@@ -17,10 +19,14 @@ def health_check():
 
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
-    # For now we return a fake answer - the real AI comes in Phase 4!
+    result = ask_llm(
+        question=request.question,
+        context=""   # no document context yet - that's Phase 4
+    )
     return {
         "question": request.question,
         "document": request.document_name,
-        "answer": "AI answer coming soon...",
-        "status": "ok"
+        "answer": result["answer"],
+        "model": result["model"],
+        "tokens_used": result["tokens_used"]
     }
