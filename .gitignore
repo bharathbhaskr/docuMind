@@ -14,6 +14,7 @@ __pycache__/
 
 # macOS
 .DS_Store
+chroma_db/
 
 # VS Code
 .vscode/
