@@ -7,7 +7,10 @@ app = FastAPI(title="DocuMind", description="AI-powered document Q&A")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://54.205.190.67:5173"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
