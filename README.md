@@ -24,30 +24,34 @@
 ---
 
 ## Architecture
-┌─────────────────┐     ┌──────────────────────────────────────────────┐
-│   React Frontend │────▶│              FastAPI Backend                  │
-│   (Vite + JS)   │     │                                              │
-└─────────────────┘     │  ┌─────────────┐      ┌──────────────────┐  │
-│  │ PDF Service │      │   RAG Service    │  │
-│  │             │      │                  │  │
-│  │ • Parse PDF │      │ • Orchestrate    │  │
-│  │ • Chunk text│      │   pipeline       │  │
-│  └─────────────┘      └──────────────────┘  │
-│                                              │
-│  ┌─────────────┐      ┌──────────────────┐  │
-│  │Vector Service│      │   LLM Service    │  │
-│  │             │      │                  │  │
-│  │ • ChromaDB  │      │ • OpenAI API     │  │
-│  │ • Embeddings│      │ • gpt-4o-mini    │  │
-│  │ • Semantic  │      │ • Source-cited   │  │
-│  │   search    │      │   responses      │  │
-│  └─────────────┘      └──────────────────┘  │
-└──────────────────────────────────────────────┘
-│
-┌────────────────▼─────────────────┐
-│          AWS EC2 (t2.micro)       │
-│     Docker + docker-compose       │
-└──────────────────────────────────┘
+## Architecture
+
+```mermaid
+flowchart TD
+    User([User]) -->|Upload PDF| Frontend
+    User -->|Ask Question| Frontend
+    Frontend[React Frontend<br/>Vite + JavaScript] -->|POST /upload| Backend
+    Frontend -->|POST /ask| Backend
+
+    subgraph Backend [FastAPI Backend]
+        PDF[PDF Service<br/>Parse + Chunk]
+        VEC[Vector Service<br/>ChromaDB + Embeddings]
+        LLM[LLM Service<br/>OpenAI GPT-4o-mini]
+        RAG[RAG Service<br/>Orchestration]
+        RAG --> PDF
+        RAG --> VEC
+        RAG --> LLM
+    end
+
+    VEC <-->|Store + Search| DB[(ChromaDB<br/>Vector Store)]
+    LLM <-->|Generate Answer| OpenAI([OpenAI API])
+    Backend -->|Answer + Sources| Frontend
+
+    subgraph Deploy [AWS EC2 t2.micro]
+        Frontend
+        Backend
+    end
+```
 
 ---
 
